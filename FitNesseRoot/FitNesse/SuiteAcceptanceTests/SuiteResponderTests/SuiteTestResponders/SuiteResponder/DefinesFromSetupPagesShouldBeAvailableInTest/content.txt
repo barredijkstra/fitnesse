@@ -5,7 +5,7 @@ This test case covers !-FitNesse-! the regression as described in issue #249 ( h
 !1 Create the page structure with the tests.
 | script | Page Builder |
 | line | ${SUT_PATH} |
-| line | !-!define TEST_SYSTEM (slim)-! |
+| line | !-!define TEST_SYSTEM {slim}-! |
 | page | !-TestSuite-! |
 
 | script | Page Builder |
@@ -45,11 +45,11 @@ This test case covers !-FitNesse-! the regression as described in issue #249 ( h
 !1 Validate the executed tests.
 | Response Examiner. |
 | type | pattern | matches? |
-| contents | undefined variable: TESTVAR_TEST | false |
-| contents | undefined variable: TESTVAR_SUITE_SETUP | false |
-| contents | undefined variable: TESTVAR_TEST_SETUP | false |
+| contents | undefined variable: TESTVAR_TEST< | false |
+| contents | undefined variable: TESTVAR_SUITE_SETUP< | false |
+| contents | undefined variable: TESTVAR_TEST_SETUP< | false |
 | contents | Assertions:.*3 right.*0 wrong.*0 exceptions | true |
 
 | Response Examiner. |
-| contents? |
+| html? |
 | |
