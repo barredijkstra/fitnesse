@@ -1,0 +1,55 @@
+Test case to ensure variables defined on the !-SuiteSetUp-! and !-SetUp-! pages (via !define) are available in the test.
+
+This test case covers !-FitNesse-! the regression as described in issue #249 ( https://github.com/unclebob/fitnesse/issues/249 )
+
+!1 Create the page structure with the tests.
+| script | Page Builder |
+| line | ${SUT_PATH} |
+| line | !-!define TEST_SYSTEM (slim)-! |
+| page | !-TestSuite-! |
+
+| script | Page Builder |
+| line | !-!define TESTVAR_SUITE_SETUP {var from suite setup}-! |
+| line | !-!|Import          |-! |
+| line | !-|fitnesse.fixtures|-! |
+| line | !- -! |
+| line | !-!|SetUp|-! |
+| page | !-TestSuite.SuiteSetUp-! |
+
+| script | Page Builder |
+| line | !-!define TESTVAR_TEST {var from test}-! |
+| line | !-  -! |
+| line | !-!|script|echo fixture                                  |-! |
+| line | !-|check|echo|${TESTVAR_TEST}       |var from test       |-! |
+| line | !-|check|echo|${TESTVAR_SUITE_SETUP}|var from suite setup|-! |
+| line | !-|check|echo|${TESTVAR_TEST_SETUP} |var from test setup |-! |
+| page | !-TestSuite.TestPage-! |
+
+| script | Page Builder |
+| line | !-!define TESTVAR_TEST_SETUP {var from test setup}-! |
+| page | !-TestSuite.TestPage.SetUp-! |
+
+!1 Ensure page creation and execute the test.
+| Response Requester. |
+| uri | valid? |
+| !-TestSuite.TestPage?responder=test-! | true |
+
+!1 Validate the variables are set during test parsing.
+
+| Response Examiner. |
+| type | pattern | matches? |
+| contents | TESTVAR_SUITE_SETUP=var from suite setup | true |
+| contents | TESTVAR_TEST_SETUP=var from test setup | true |
+| contents | TESTVAR_TEST=var from test | true |
+
+!1 Validate the executed tests.
+| Response Examiner. |
+| type | pattern | matches? |
+| contents | undefined variable: TESTVAR_TEST | false |
+| contents | undefined variable: TESTVAR_SUITE_SETUP | false |
+| contents | undefined variable: TESTVAR_TEST_SETUP | false |
+| contents | Assertions:.*3 right.*0 wrong.*0 exceptions | true |
+
+| Response Examiner. |
+| contents? |
+| |
