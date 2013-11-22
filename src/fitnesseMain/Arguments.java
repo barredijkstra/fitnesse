@@ -7,13 +7,14 @@ import fitnesse.FitNesseContext;
 public class Arguments {
   public static final String DEFAULT_PATH = ".";
   public static final String DEFAULT_ROOT = "FitNesseRoot";
+  public static final String DEFAULT_WEB_ROOT_CONTEXT = "";
   public static final int DEFAULT_COMMAND_PORT = 9123;
   public static final String DEFAULT_CONFIG_FILE = "plugins.properties";
-
   public static final int DEFAULT_VERSION_DAYS = 14;
   private String rootPath = DEFAULT_PATH;
   private int port = -1;
   private String rootDirectory = DEFAULT_ROOT;
+  private String webRootContext = DEFAULT_WEB_ROOT_CONTEXT;
   private String logDirectory;
   private boolean omitUpdate = false;
   private int daysTillVersionsExpire = DEFAULT_VERSION_DAYS;
@@ -36,10 +37,6 @@ public class Arguments {
     return port == -1 ? getDefaultPort() : port;
   }
 
-  private int getDefaultPort() {
-    return command == null ? FitNesseContext.DEFAULT_PORT : DEFAULT_COMMAND_PORT;
-  }
-
   public void setPort(String port) {
     this.port = Integer.parseInt(port);
   }
@@ -50,6 +47,18 @@ public class Arguments {
 
   public void setRootDirectory(String rootDirectory) {
     this.rootDirectory = rootDirectory;
+  }
+
+  public String getWebRootContext() {
+      return webRootContext;
+  }
+
+  public boolean isWebRootContextUsed() {
+      return webRootContext == null || DEFAULT_WEB_ROOT_CONTEXT.equals(webRootContext);
+  }
+
+  public void setWebRootContext(String webRootContext) {
+      this.webRootContext = webRootContext;
   }
 
   public String getLogDirectory() {
@@ -68,15 +77,15 @@ public class Arguments {
     return omitUpdate;
   }
 
-  public void setUserpass(String userpass) {
-    this.userpass = userpass;
-  }
-
   public String getUserpass() {
     if (userpass == null || userpass.length() == 0)
       return null;
     else
       return userpass;
+  }
+
+  public void setUserpass(String userpass) {
+    this.userpass = userpass;
   }
 
   public int getDaysTillVersionsExpire() {
@@ -106,12 +115,12 @@ public class Arguments {
     this.command = command;
   }
 
-  public void setOutput(String output) {
-    this.output = output;
-  }
-
   public String getOutput() {
     return output;
+  }
+
+  public void setOutput(String output) {
+    this.output = output;
   }
 
   public String getConfigFile() {
@@ -128,5 +137,9 @@ public class Arguments {
 
   public boolean hasVerboseLogging() {
     return verboseLogging;
+  }
+
+  private int getDefaultPort() {
+    return command == null ? FitNesseContext.DEFAULT_PORT : DEFAULT_COMMAND_PORT;
   }
 }

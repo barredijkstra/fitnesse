@@ -30,6 +30,7 @@ public class FitNesseContext {
 
     public int port = -1;
     public String rootPath;
+    public String webRootContext;
     public String rootDirectoryName;
 
     public Logger logger;
@@ -48,6 +49,7 @@ public class FitNesseContext {
         root = context.root;
         port = context.port;
         rootPath = context.rootPath;
+        webRootContext = context.webRootContext;
         rootDirectoryName = context.rootDirectoryName;
         logger = context.logger;
         authenticator = context.authenticator;
@@ -68,6 +70,7 @@ public class FitNesseContext {
       return new FitNesseContext(version,
           root,
           rootPath,
+          webRootContext,
           rootDirectoryName,
           versionsController,
           recentChanges,
@@ -85,6 +88,7 @@ public class FitNesseContext {
 
   public final int port;
   public final String rootPath;
+  public final String webRootContext;
   public final String rootDirectoryName;
   public final ResponderFactory responderFactory;
   public final PageFactory pageFactory;
@@ -97,7 +101,7 @@ public class FitNesseContext {
 
 
 
-  private FitNesseContext(FitNesseVersion version, WikiPage root, String rootPath,
+  private FitNesseContext(FitNesseVersion version, WikiPage root, String webRootContext, String rootPath,
       String rootDirectoryName, VersionsController versionsController,
       RecentChanges recentChanges, int port,
       Authenticator authenticator, Logger logger, Properties properties) {
@@ -105,6 +109,7 @@ public class FitNesseContext {
     this.version = version;
     this.root = root;
     this.rootPath = rootPath != null ? rootPath : ".";
+    this.webRootContext = webRootContext != null ? webRootContext : "";
     this.rootDirectoryName = rootDirectoryName != null ? rootDirectoryName : "FitNesseRoot";
     this.versionsController = versionsController;
     this.recentChanges = recentChanges;

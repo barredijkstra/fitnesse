@@ -1,7 +1,6 @@
 package fitnesseMain;
 
 import fitnesse.components.ComponentFactory;
-import fitnesse.FitNesse;
 import fitnesse.FitNesseContext;
 import fitnesse.FitNesseContext.Builder;
 import fitnesse.Updater;
@@ -211,7 +210,7 @@ public class FitNesseMain {
   // Move to Arguments class.
   public static Arguments parseCommandLine(String[] args) {
     CommandLine commandLine = new CommandLine(
-      "[-v][-p port][-d dir][-r root][-l logDir][-f config][-e days][-o][-i][-a userpass][-c command][-b output]");
+      "[-v][-p port][-d dir][-r root][-l logDir][-w webContext][-f config][-e days][-o][-i][-a userpass][-c command][-b output]");
     Arguments arguments = null;
     if (commandLine.parse(args)) {
       arguments = new Arguments();
@@ -235,6 +234,8 @@ public class FitNesseMain {
         arguments.setOutput(commandLine.getOptionArgument("b", "output"));
       if (commandLine.hasOption("f"))
         arguments.setConfigFile(commandLine.getOptionArgument("f", "config"));
+      if (commandLine.hasOption("w"))
+        arguments.setWebRootContext(commandLine.getOptionArgument("w", "webContext"));
       arguments.setOmitUpdates(commandLine.hasOption("o"));
       arguments.setInstallOnly(commandLine.hasOption("i"));
     }
@@ -242,12 +243,13 @@ public class FitNesseMain {
   }
 
   private static void printUsage() {
-    System.err.println("Usage: java -jar fitnesse.jar [-vpdrleoab]");
+    System.err.println("Usage: java -jar fitnesse.jar [-vpdrwleoab]");
     System.err.println("\t-p <port number> {" + FitNesseContext.DEFAULT_PORT + "}");
     System.err.println("\t-d <working directory> {" + Arguments.DEFAULT_PATH
       + "}");
     System.err.println("\t-r <page root directory> {" + Arguments.DEFAULT_ROOT
       + "}");
+    System.err.println("\t-w <web root context> {" + Arguments.DEFAULT_WEB_ROOT_CONTEXT + "}");
     System.err.println("\t-l <log directory> {no logging}");
     System.err.println("\t-f <config properties file> {" + Arguments.DEFAULT_CONFIG_FILE + "}");
     System.err.println("\t-e <days> {" + Arguments.DEFAULT_VERSION_DAYS

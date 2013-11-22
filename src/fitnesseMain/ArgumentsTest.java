@@ -15,6 +15,7 @@ public class ArgumentsTest {
     assertNotNull(args);
     assertEquals(80, args.getPort());
     assertEquals(".", args.getRootPath());
+    assertEquals("", args.getWebRootContext());
   }
 
   private Arguments makeArgs(String... argArray) {
@@ -28,6 +29,7 @@ public class ArgumentsTest {
     assertEquals(".", args.getRootPath());
     assertEquals("FitNesseRoot", args.getRootDirectory());
     assertEquals(null, args.getLogDirectory());
+    assertEquals("", args.getWebRootContext());
     assertEquals(false, args.isOmittingUpdates());
     assertEquals(14, args.getDaysTillVersionsExpire());
     assertEquals(null, args.getUserpass());
@@ -37,11 +39,12 @@ public class ArgumentsTest {
 
   @Test
   public void testArgumentsAlternates() throws Exception {
-    String argString = "-p 123 -d MyWd -r MyRoot -l LogDir -e 321 -o -a userpass.txt -i";
+    String argString = "-p 123 -d MyWd -w /My/WebContext -r MyRoot -l LogDir -e 321 -o -a userpass.txt -i";
     makeArgs(argString.split(" "));
     assertEquals(123, args.getPort());
     assertEquals("MyWd", args.getRootPath());
     assertEquals("MyRoot", args.getRootDirectory());
+    assertEquals("/My/WebContext", args.getWebRootContext());
     assertEquals("LogDir", args.getLogDirectory());
     assertEquals(true, args.isOmittingUpdates());
     assertEquals(321, args.getDaysTillVersionsExpire());
@@ -51,11 +54,12 @@ public class ArgumentsTest {
 
   @Test
   public void testAllArguments() throws Exception {
-    args = makeArgs("-p", "81", "-d", "directory", "-r", "root",
+    args = makeArgs("-p", "81", "-d", "directory", "-w", "/My/WebContext", "-r", "root",
         "-l", "myLogDirectory", "-o", "-e", "22");
     assertNotNull(args);
     assertEquals(81, args.getPort());
     assertEquals("directory", args.getRootPath());
+    assertEquals("/My/WebContext", args.getWebRootContext());
     assertEquals("root", args.getRootDirectory());
     assertEquals("myLogDirectory", args.getLogDirectory());
     assertTrue(args.isOmittingUpdates());
