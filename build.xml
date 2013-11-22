@@ -6,9 +6,11 @@
 
 	<property environment="env"/>
 	<property name="env.FITNESSE_TEST_PORT" value="8080"/>
-	<property name="src.dir" location="src"/>
+    <property name="src.dir" location="src"/>
+    <property name="test.src.dir" location="test"/>
 	<property name="classes.dir" location="classes"/>
-	<property name="fitnesseRoot" value="FitNesseRoot"/>
+    <property name="test.classes.dir" location="classes"/>
+    <property name="fitnesseRoot" value="FitNesseRoot"/>
 	<property name="results.dir" location="test-results"/>
 	<property name="dist.dir" location="dist"/>
 	<property name="javadoc.dir" location="javadoc"/>
@@ -47,16 +49,7 @@
 		<delete file="${dist.dir}/fitnesse.jar" />
 
 		<jar jarfile="${dist.dir}/fitnesse.jar" basedir="${classes.dir}">
-			<include name="**/*.class" />
-			<exclude name="**/*Test.class" />
-			<exclude name="**/*TestSuite.class" />
-			<include name="fitnesse/resources/**" />
-			<include name="Resources/**" />
-			<include name="**/*.properties" />
-			<include name="META-INF/FitNesseVersion.txt" />
-
-			<fileset dir="${classes.dir}" includes="**/SystemUnderTest.class,**/MySystemUnderTest.class" />
-
+			<include name="**" />
 			<zipfileset refid="wikipages.fileset" />
 
 			<manifest>
@@ -110,23 +103,27 @@
 		</java>
 	</target>
 
-	<target name="compile" depends="stamp-version, resolve" description="compile the source (make)">
-		<mkdir dir="${classes.dir}" />
-		<javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" debug="true" source="1.6" target="1.6" includeantruntime="false" />
-		<copy file="extra/ant/tasks.properties" todir="${classes.dir}" />
-		<copy todir="${classes.dir}">
-			<fileset dir="${src.dir}">
-				<include name="fitnesse/resources/**" />
-				<include name="**/*.properties" />
-			</fileset>
-		</copy>
-	</target>
+    <target name="compile" depends="stamp-version, resolve" description="compile the source (make)">
+        <mkdir dir="${classes.dir}" />
+        <javac srcdir="${src.dir}" destdir="${classes.dir}" classpathref="classpath" debug="true" source="1.6" target="1.6" includeantruntime="false" />
+        <copy todir="${classes.dir}">
+            <fileset dir="${src.dir}">
+                <include name="fitnesse/resources/**" />
+                <include name="**/*.properties" />
+            </fileset>
+        </copy>
+    </target>
 
-        <target name="post-compile" depends="stamp-version, retrieve" description="post-compile steps, use those in your IDE" />
+    <target name="test-compile" depends="compile" description="compile the source (make)">
+        <mkdir dir="${test.classes.dir}" />
+        <javac srcdir="${test.src.dir}" destdir="${test.classes.dir}" classpathref="classpath" debug="true" source="1.6" target="1.6" includeantruntime="false" />
+    </target>
+
+    <target name="post-compile" depends="stamp-version, retrieve" description="post-compile steps, use those in your IDE" />
 
 	<target name="bootstrap-needs-update">
 		<uptodate property="bootstrap-css-up-to-date" targetfile="${classes.dir}/fitnesse/resources/bootstrap/css/fitnesse-bootstrap.css" >
-			<srcfiles dir="${basedir}" includes="${src.dir}/fitnesse/resources/bootstrap/less/*.less" />
+			<srcfiles dir="${src.dir}/fitnesse/resources/bootstrap/less" includes="*.less" />
 		</uptodate>
 	</target>
 
@@ -138,7 +135,7 @@
 			failonerror="true"
 			fork="true"
 			output="${classes.dir}/fitnesse/resources/bootstrap/css/fitnesse-bootstrap.css">
-			<arg value="extra/lesscss/less-rhino-1.3.3.js" />
+			<arg value="extra/lesscss/less-rhino-1.4.0.js" />
 			<arg value="${src.dir}/fitnesse/resources/bootstrap/less/fitnesse-bootstrap.less" />
 		</java>
 	</target>
@@ -174,6 +171,7 @@
 
 	<target name="clean" description="delete everything in the classes directory">
 		<delete dir="${classes.dir}" />
+		<delete dir="${test.classes.dir}" />
 		<delete dir="${results.dir}" />
 		<delete dir="${lib.dir}" />
 		<delete dir="${dist.dir}" />
@@ -182,20 +180,15 @@
 		<delete file="updateDoNotCopyOverList"/>
 	</target>
 
-	<target name="unit_test" depends="compile" description="run the unit tests">
+	<target name="unit_test" depends="test-compile" description="run the unit tests">
 		<mkdir dir="${results.dir}" />
 		<junit forkmode="once" fork="yes" printsummary="no" haltonfailure="yes" haltonerror="yes" dir="${basedir}">
 			<classpath refid="classpath" />
 			<formatter type="xml" usefile="true" />
 			<formatter type="plain" usefile="false" />
 			<batchtest todir="${results.dir}">
-				<fileset dir="${src.dir}">
+				<fileset dir="${test.src.dir}">
 					<include name="**/*Test.java" />
-					<exclude name="**/ShutdownResponderTest.java" />
-					<exclude name="**/QueryTableBaseTest.java" />
-					<exclude name="**/Test.java" />
-					<exclude name="**/SystemUnderTest.java" />
-					<exclude name="**/MySystemUnderTest.java" />
 				</fileset>
 			</batchtest>
 		</junit>
@@ -238,13 +231,14 @@
 		<ivy:cachepath pathid="lib.classpath" />
 		<path id="classpath">
 			<pathelement path="${classes.dir}" />
+			<pathelement path="${test.classes.dir}" />
 			<path refid="lib.classpath" />
 		</path>
 	</target>
 
 	<target name="pom" depends="resolve,set-version-if-not-manualy-set">
 		<ivy:deliver deliverpattern="${dist.dir}/ivy.xml" pubrevision="${version}" status="release" />
-		<ivy:makepom ivyfile="${dist.dir}/ivy.xml" templatefile="templates/pom.xml.template" pomfile="${dist.dir}/fitnesse.pom" conf="standalone,default,test">
+		<ivy:makepom ivyfile="${dist.dir}/ivy.xml" templatefile="extra/maven/pom.xml.template" pomfile="${dist.dir}/fitnesse.pom" conf="standalone,default,test">
 			   <mapping conf="standalone" scope="compile" />
 			   <mapping conf="test" scope="test" />
 		</ivy:makepom>
